@@ -36,13 +36,13 @@ public class anasayfaController {
 
         //this.ListInformation();
         ObservableList<Kisi> mylist = FXCollections.observableList(DataModel.getInstance().getAllKisiler(DataModel.ORDER_BY_ASC));
+
+        kisiAd.setCellValueFactory(cellData -> cellData.getValue().adProperty());
+        kisiSoyad.setCellValueFactory(cellData -> cellData.getValue().soyadProperty());
+        kisiTelefon.setCellValueFactory(cellData -> cellData.getValue().telefonProperty());
+        kisiBirimAdi.setCellValueFactory(cellData -> cellData.getValue().epostaProperty());
+
         kisilerTablosu.setItems(mylist);
-        kisiAd.setCellValueFactory(new PropertyValueFactory<Kisi, String>("adProperty"));
-        kisiSoyad.setCellValueFactory(new PropertyValueFactory<Kisi, String>("soyad"));
-        kisiTelefon.setCellValueFactory(new PropertyValueFactory<Kisi, String>("telefon"));
-        kisiBirimAdi.setCellValueFactory(new PropertyValueFactory<Kisi, String>("eposta"));
-
-
 
     }
     public void ListInformation(){
