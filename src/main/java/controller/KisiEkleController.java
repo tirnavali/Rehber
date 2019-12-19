@@ -12,6 +12,8 @@ import model.Birim;
 import model.DataModel;
 import model.Kisi;
 
+import java.time.LocalDate;
+
 public class KisiEkleController {
 
     @FXML
@@ -20,9 +22,13 @@ public class KisiEkleController {
     private ComboBox<Birim> birimComboBox;
     @FXML
     private TextField inputAd, inputSoyad, inputAd2, inputIsTelefon, inputCepTelefon, inputEposta;
+    @FXML
+    private DatePicker dateBaslama, dateBitis;
 
     /* Fonksiyonlarda kullanılan parametlereler */
     private Birim secilenBirim = null;
+    private LocalDate baslangic;
+    private LocalDate bitis;
 
 
 
@@ -49,6 +55,19 @@ public class KisiEkleController {
                 yeniKisi.setCepTelefon(inputCepTelefon.getText());
                 yeniKisi.setEposta(inputEposta.getText());
                 yeniKisi.setFotograf("");
+
+                baslangic = dateBaslama.getValue();
+                if(dateBitis != null) {
+                    bitis = dateBitis.getValue();
+                } else {
+                    bitis = null;
+                    System.out.println(bitis.toString());
+                }
+
+                DataModel.getInstance().insertKisiXBirim(yeniKisi.getAd(),yeniKisi.getSoyad(),yeniKisi.getAd_2(),yeniKisi.getTelefon(),yeniKisi.getCepTelefon(),
+                        yeniKisi.getEposta(),yeniKisi.getFotograf(),secilenBirim.getAd(),dateBaslama.getValue().toString(),dateBitis.getValue().toString());
+
+
 
                 /*buradan devam*/
 
