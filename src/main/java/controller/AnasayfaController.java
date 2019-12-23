@@ -15,6 +15,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.DataModel;
@@ -38,6 +39,9 @@ public class AnasayfaController {
 
     @FXML
     ProgressBar uprogressBar;
+    @FXML
+    VBox anasayfaVbox;
+
 
     public void initialize(){
         System.out.println("Controller initialize methodu çalıştı...");
@@ -70,10 +74,11 @@ public class AnasayfaController {
             Parent kisiEkleParent =
                     FXMLLoader.load(getClass().getResource("/fxml/kisiEkle-2.fxml"));
             Scene scene = new Scene(kisiEkleParent,600,300);
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.showAndWait();
+            Stage ekleStage = new Stage();
+            ekleStage.initOwner(anasayfaVbox.getScene().getWindow());
+            ekleStage.setScene(scene);
+            ekleStage.initModality(Modality.APPLICATION_MODAL);
+            ekleStage.showAndWait();
 
         } catch (IOException e) {
             System.out.println("FXML Yüklenemedi");

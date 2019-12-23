@@ -8,7 +8,9 @@ import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.Birim;
 import model.DataModel;
@@ -16,6 +18,8 @@ import model.Kisi;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.util.Random;
+import java.util.UUID;
 
 public class KisiEkleController {
 
@@ -94,16 +98,25 @@ public class KisiEkleController {
     private void fotografSec(){
 
         File initialDirectory = new File(System.getProperty("user.home"));
-        Stage stage = new Stage();
+        File photoName = new File(LocalDate.now().toString()+"-"+ UUID.randomUUID().toString()+".jpg");
+
+
+
+
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Lütfen bir fotoğraf seçiniz!");
 
         fileChooser.setInitialDirectory(initialDirectory);
         fileChooser.getExtensionFilters().add(0, new FileChooser.ExtensionFilter("JPG", "*.jpg"));
         File selectedPhoto =
-        fileChooser.showOpenDialog(stage);
+        fileChooser.showOpenDialog(kisiEklePane.getScene().getWindow()); // kök pencereye ulaştık
+
         fotografYoluLabel.setText(selectedPhoto.toString());
         fotografYoluLabel.setTooltip(new Tooltip(selectedPhoto.toString()));
+        System.out.println("Fotograf yeni dosya adi :"+photoName);
+
+        Image image = new Image(selectedPhoto.toString());
+
 
     }
 }
