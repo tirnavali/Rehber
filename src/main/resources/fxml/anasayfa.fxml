@@ -38,6 +38,9 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </padding>
       </HBox>
-      <ProgressBar fx:id="uprogressBar" prefWidth="200.0" progress="0.0" />
+      <ProgressBar fx:id="uprogressBar" prefHeight="18.0" prefWidth="410.0" progress="0.0">
+         <padding>
+            <Insets left="10.0" />
+         </padding></ProgressBar>
    </children>
 </VBox>

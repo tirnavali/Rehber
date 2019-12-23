@@ -3,6 +3,9 @@ package model;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
+/** Birim sınıfı.
+ ** Veri tabanına yazılmak üzere hazırlanmış olan entitiy (varlık). ***/
+
 public class Birim {
     private SimpleIntegerProperty id;
     private SimpleStringProperty ad;
