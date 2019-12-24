@@ -4,5 +4,6 @@ module JavaFxApplication {
     requires javafx.graphics;
     requires javafx.controls;
     requires java.sql;
+
     opens controller;
 }

@@ -16,10 +16,11 @@ import model.Birim;
 import model.DataModel;
 import model.Kisi;
 
-import java.io.File;
+import java.io.*;
 import java.time.LocalDate;
 import java.util.Random;
 import java.util.UUID;
+
 
 public class KisiEkleController {
 
@@ -93,15 +94,17 @@ public class KisiEkleController {
         this.secilenBirim = birimComboBox.getSelectionModel().getSelectedItem();
     }
 
-    /**Kişi ekleme sayfası fotoğraf seçme tuşu*/
+    /**Kişi ekleme sayfası fotoğraf seçme tuşu
+     * Fotoğraf images klasörüne kopyalanıyor..
+     * Fakat kullanıcı vazgeçerse silinmesi lazım.
+     * */
     @FXML
     private void fotografSec(){
 
         File initialDirectory = new File(System.getProperty("user.home"));
-        File photoName = new File(LocalDate.now().toString()+"-"+ UUID.randomUUID().toString()+".jpg");
-
-
-
+        File curdir           = new File(System.getProperty("user.dir"));
+        System.out.println("CURDIR ___ "+curdir.toString());
+        File newPhotoName = new File(curdir.toString()+"\\src\\main\\resources\\images\\"+LocalDate.now().toString()+"-"+ UUID.randomUUID().toString()+".jpg");
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Lütfen bir fotoğraf seçiniz!");
@@ -113,10 +116,20 @@ public class KisiEkleController {
 
         fotografYoluLabel.setText(selectedPhoto.toString());
         fotografYoluLabel.setTooltip(new Tooltip(selectedPhoto.toString()));
-        System.out.println("Fotograf yeni dosya adi :"+photoName);
+        System.out.println("Fotograf yeni dosya adi :"+newPhotoName);
 
-        Image image = new Image(selectedPhoto.toString());
 
+        try(InputStream in = new BufferedInputStream(new FileInputStream(selectedPhoto));
+            OutputStream out = new BufferedOutputStream(new FileOutputStream(newPhotoName))){
+            byte[] buffer = new byte[1024];
+            int lengthRead;
+            while ((lengthRead = in.read(buffer))>0){
+                out.write(buffer, 0, lengthRead);
+                out.flush();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 }
