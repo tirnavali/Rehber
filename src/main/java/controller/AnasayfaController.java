@@ -1,5 +1,7 @@
 package controller;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -49,6 +51,9 @@ public class AnasayfaController {
         Image foto = new Image(getClass().getResourceAsStream("/images/person.png"));
         fotograf.setImage(foto);
 
+        kisilerTablosu.setOnMouseClicked(mouseEvent -> detayGoster());
+
+
 
         //this.ListInformation();
         //ObservableList<Kisi> mylist = FXCollections.observableList(DataModel.getInstance().getAllKisiler(DataModel.ORDER_BY_ASC));
@@ -66,6 +71,24 @@ public class AnasayfaController {
 
 
 
+    }
+    public void detayGoster(){
+        Kisi secilen =  kisilerTablosu.getSelectionModel().getSelectedItem();
+        System.out.println("Detaylar gösteriliyor.."+secilen.toString());
+        try {
+            Parent detayGoster =
+                    FXMLLoader.load(getClass().getResource("/fxml/detayGoruntule.fxml"));
+            Scene scene = new Scene(detayGoster, 600, 800);
+            Stage detayStage = new Stage();
+            detayStage.initOwner(anasayfaVbox.getScene().getWindow());
+            detayStage.setScene(scene);
+            detayStage.initModality(Modality.APPLICATION_MODAL);
+            detayStage.show();
+
+        } catch (Exception e) {
+            System.out.println("FXML Yüklenemedi");
+            e.printStackTrace();
+        }
     }
 
     public void ekle(){

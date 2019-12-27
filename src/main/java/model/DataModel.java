@@ -6,8 +6,8 @@ import java.util.List;
 
 
 public class DataModel {
-    public static final String DB_NAME="rehber.db";
-    public static final String DB_PATH ="jdbc:sqlite:C:\\Users\\62542\\IdeaProjects\\Rehber\\src\\main\\java\\model\\";
+    public static final String DB_NAME= "rehber.db";
+    public static final String DB_PATH ="jdbc:sqlite:C:\\Users\\62542\\IdeaProjects\\Rehber\\src\\main\\resources\\database\\";
     public static final String DB_FULL_PATH = DB_PATH+DB_NAME;
     public static final String COLLATE_NOCASE = " COLLATE NOCASE";
     public static final int    ORDER_BY_ASC =1;
