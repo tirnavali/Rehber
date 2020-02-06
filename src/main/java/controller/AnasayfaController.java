@@ -11,15 +11,14 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import model.DataModel;
 import model.Kisi;
 
@@ -44,14 +43,55 @@ public class AnasayfaController {
     @FXML
     VBox anasayfaVbox;
 
-
+    @FXML
     public void initialize(){
         System.out.println("Controller initialize methodu çalıştı...");
         uprogressBar.setProgress(1);
         Image foto = new Image(getClass().getResourceAsStream("/images/person.png"));
         fotograf.setImage(foto);
 
-        kisilerTablosu.setOnMouseClicked(mouseEvent -> detayGoster());
+
+        // kısa Yoldan yazılmış satıra tıklama fonksiyonu
+//        kisilerTablosu.setRowFactory(tv ->
+//            {
+//                TableRow<Kisi> row = new TableRow<Kisi>();
+//                row.setOnMouseClicked(event -> {
+//                    if (event.getClickCount() == 2 && (!row.isEmpty())) {
+//                        Kisi kisi = row.getItem();
+//                        System.out.println("Kişi "+ kisi);
+//                    }
+//                });
+//                return row;
+//            });
+
+        //* Bu Fonksiyon uzun yoldan aksiyon eklemeyi gösteriyor. Kısa yol için lambda kullanılıyor
+        //  Burada Callback 2 parametre alıyor. Birincisi Callback ateşleyenin kim olduğu
+        //  ikinicisi Callback sonucu ne döneceği
+        //  Callback bir interface olduğu için call methodu ile çalışmamız gerektiğini söylüyor.
+        //  call methodu altına yeni bir TableRow tanımlıyoruz. Olay tetikleyiciyi bu fonksiyon içinde
+        //  gerçekleştiriyoruz ki istediğimiz olay tetiklenince CallBack bize dönüş yapsın.
+        // */
+        kisilerTablosu.setRowFactory(
+                new Callback<TableView<Kisi>, TableRow<Kisi>>() {
+                    @Override
+                    public TableRow<Kisi> call(TableView<Kisi> param) {
+                        TableRow<Kisi> row = new TableRow<>();
+                        row.setOnMouseClicked(
+                                new EventHandler<MouseEvent>() {
+                                    @Override
+                                    public void handle(MouseEvent event) {
+                                        if(event.getClickCount() == 2 && (!row.isEmpty())){
+                                            Kisi kisi = row.getItem();
+                                            detayGoster();
+                                            System.out.println("Kişi "+kisi);
+                                        }
+                                    }
+                                }
+                        );
+                        return row;
+                    }
+                }
+        );
 
 
 
@@ -66,7 +106,24 @@ public class AnasayfaController {
 //        kisiBirimAdi.setCellValueFactory(cellData -> cellData.getValue().epostaProperty());
 
         //kisilerTablosu.setItems(anaEkrankisiler);
-        System.out.println("ANA ekrana kisiler ekleniyor....");
+
+        Task<ObservableList<Kisi>> task = new GetAllPeopleTask();
+
+        task.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent workerStateEvent) {
+                kisiAd.setCellValueFactory(cellData -> cellData.getValue().adProperty());
+                kisiSoyad.setCellValueFactory(cellData -> cellData.getValue().soyadProperty());
+                kisiTelefon.setCellValueFactory(cellData -> cellData.getValue().telefonProperty());
+                kisiBirimAdi.setCellValueFactory(cellData -> cellData.getValue().epostaProperty());
+                anaEkrankisiler = task.getValue();
+                kisilerTablosu.setItems(anaEkrankisiler);
+                System.out.println("ANA EKRAN KİSİLER --- "+anaEkrankisiler.toString());
+
+            }
+        });
+        uprogressBar.progressProperty().bind(task.progressProperty());
+        new Thread(task).start();
 
 
 
@@ -76,17 +133,26 @@ public class AnasayfaController {
         Kisi secilen =  kisilerTablosu.getSelectionModel().getSelectedItem();
         System.out.println("Detaylar gösteriliyor.."+secilen.toString());
         try {
-            Parent detayGoster =
-                    FXMLLoader.load(getClass().getResource("/fxml/detayGoruntule.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/detayGoruntule.fxml"));
+
+            Parent detayGoster = loader.load();
+            // Statik olarak yüklersen controller ayarı yapamazsın dikkatli ol.
+//            Parent detayGoster =
+//                    FXMLLoader.load(getClass().getResource("/fxml/detayGoruntule.fxml"));
             Scene scene = new Scene(detayGoster, 600, 800);
             Stage detayStage = new Stage();
             detayStage.initOwner(anasayfaVbox.getScene().getWindow());
             detayStage.setScene(scene);
             detayStage.initModality(Modality.APPLICATION_MODAL);
+
+            DetayGosterController  dgController = loader.<DetayGosterController>getController();
+
+            Kisi kisi = DataModel.getInstance().findKisi(secilen.getId());
+            dgController.setKisi(kisi);
             detayStage.show();
 
         } catch (Exception e) {
-            System.out.println("FXML Yüklenemedi");
+            System.out.println("Detay Görüntüle FXML Yüklenemedi");
             e.printStackTrace();
         }
     }
@@ -126,7 +192,7 @@ public class AnasayfaController {
                 kisilerTablosu.setItems(anaEkrankisiler);
                 System.out.println("ANA EKRAN KİSİLER --- "+anaEkrankisiler.toString());
                 try{
-                    Thread.sleep(4000);
+                    Thread.sleep(400);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -148,6 +214,8 @@ public class AnasayfaController {
     class GetAllPeopleTask extends Task{
         @Override
         protected ObservableList call() throws Exception {
+            System.out.println("Task çalıştı");
+
             return FXCollections.observableArrayList(DataModel.getInstance().getAllKisiler(DataModel.ORDER_BY_ASC));
         }
     }

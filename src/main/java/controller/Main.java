@@ -12,22 +12,12 @@ import java.util.List;
 
 
 public class Main extends Application {
-    private static Stage mainTheatre;
-
-
-    /* Programın anasayfasındaki anapencereye
-    /* ulaşmayı sağlar*/
-    public static Stage getMainTheatre(){
-        return mainTheatre;
-    }
-
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/anasayfa.fxml"));
         primaryStage.setTitle("Telefon rehberi By Tırnavalı V. 1.00");
         primaryStage.setScene(new Scene(root, 740, 450));
-        mainTheatre = primaryStage;
         primaryStage.show();
     }
 
@@ -42,26 +32,26 @@ public class Main extends Application {
         System.out.println("Çalıştı");
         DataModel dataModel = DataModel.getInstance();
         dataModel.openConn();
-        dataModel.insertKisiXBirim("Ragıp","Hüseyinciler","","4456","5547895265","rgphsüyn@gmail.com","",
-                "Danışma","22-10-2001","");
-        dataModel.insertKisiXBirim("Akif","Yücedal","","2211","5341231212","akf@gmail.com","",
-                "Tutanak Dokümantasyon","22-10-2004","");
-        dataModel.insertKisiXBirim("Can","Tanol","","4457","5447885050","cantan@gmail.com","",
-                "Dergi Dokümantasyon","22-10-2010","");
-        dataModel.insertKisiXBirim("Faruk","Çamlıbel","","1111","5558455698","ahmtcandr@gmail.com","",
-                "Süreli Yayınlar","22-10-2001","");
-
-//        dataModel.insertBirim("Süreli Yayınlar");
-//        dataModel.insertBirim("İdari Büro");
-//        dataModel.insertBirim("Danışma");
-//        dataModel.insertBirim("Kataloglama");
-//        dataModel.insertBirim("Dergi Dokümantasyon");
-//        dataModel.insertBirim("Tutanak Dokümantasyon");
-
+//        dataModel.insertKisiXBirim("Ragıp","Hüseyinciler","","4456","5547895265","rgphsüyn@gmail.com","",
+//                "Danışma","22-10-2001","");
+//        dataModel.insertKisiXBirim("Akif","Yücedal","","2211","5341231212","akf@gmail.com","",
+//                "Tutanak Dokümantasyon","22-10-2004","");
+//        dataModel.insertKisiXBirim("Can","Tanol","","4457","5447885050","cantan@gmail.com","",
+//                "Dergi Dokümantasyon","22-10-2010","");
+//        dataModel.insertKisiXBirim("Faruk","Çamlıbel","","1111","5558455698","ahmtcandr@gmail.com","",
+//                "Süreli Yayınlar","22-10-2001","");
+//
+////        dataModel.insertBirim("Süreli Yayınlar");
+////        dataModel.insertBirim("İdari Büro");
+////        dataModel.insertBirim("Danışma");
+////        dataModel.insertBirim("Kataloglama");
+////        dataModel.insertBirim("Dergi Dokümantasyon");
+////        dataModel.insertBirim("Tutanak Dokümantasyon");
+//
         for(Birim b : dataModel.getAllBirimler(1)){
             System.out.println(b.toString());
         }
-
+//
         List<Kisi> kisiler =  dataModel.getAllKisiler(3);
         for(Kisi k : kisiler) {
             System.out.println(k.toString());

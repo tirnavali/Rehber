@@ -7,7 +7,7 @@ import java.util.List;
 
 public class DataModel {
     public static final String DB_NAME= "rehber.db";
-    public static final String DB_PATH ="jdbc:sqlite:C:\\Users\\62542\\IdeaProjects\\Rehber\\src\\main\\resources\\database\\";
+    public static final String DB_PATH ="jdbc:sqlite:C:\\Users\\62542\\IdeaProjects\\Rehber\\src\\main\\java\\model\\";
     public static final String DB_FULL_PATH = DB_PATH+DB_NAME;
     public static final String COLLATE_NOCASE = " COLLATE NOCASE";
     public static final int    ORDER_BY_ASC =1;
@@ -23,6 +23,8 @@ public class DataModel {
     public static final String COLUMN_KISILER_CEP_TEL = "cepTelefon";
     public static final String COLUMN_KISILER_EPOSTA = "eposta";
     public static final String COLUMN_KISILER_FOTO = "fotograf";
+    public static final String FIND_KISI = "SELECT * FROM "+TABLE_KISILER+" WHERE "+COLUMN_KISILER_ID+" = ?";
+
     public static final String SELECT_KISILER="SELECT * FROM "+TABLE_KISILER;
     public static final String QUERY_KISI="SELECT * FROM "+TABLE_KISILER+" WHERE "+COLUMN_KISILER_AD+" = ? AND "+COLUMN_KISILER_SOYAD+" = ?"+COLLATE_NOCASE;
     public static final String INSERT_KISI="INSERT INTO "+TABLE_KISILER+" ( "+COLUMN_KISILER_AD+","+COLUMN_KISILER_SOYAD+","+COLUMN_KISILER_AD2+","+COLUMN_KISILER_TELEFON+
@@ -32,6 +34,7 @@ public class DataModel {
     public static final String TABLE_BIRIMLER = "birimler";
     public static final String COLUMN_BIRIM_ID = "id";
     public static final String COLUMN_BIRIM_AD = "birim_adi";
+    public static final String FIND_BIRIM = "SELECT * FROM "+TABLE_BIRIMLER+" WHERE "+COLUMN_BIRIM_ID+" = ?";
     public static final String QUERY_BIRIM = "SELECT * FROM "+TABLE_BIRIMLER+" WHERE "+COLUMN_BIRIM_AD+" = ? "+COLLATE_NOCASE;
     public static final String INSERT_BIRIM = "INSERT INTO "+TABLE_BIRIMLER+" ( "+COLUMN_BIRIM_AD+" ) VALUES (?)";
 
@@ -41,15 +44,23 @@ public class DataModel {
     public static final String COLUMN_KISI_X_BIRIM_BIRIM_ID="birim_id";
     public static final String COLUMN_KISI_X_BIRIM_GOREV_BASLAMA_TARIHI="gorev_baslangic_tarihi";
     public static final String COLUMN_KISI_X_BIRIM__GORER_BITIS_TARIHI="gorev_bitis_tarihi";
+    public static final String FIND_KISI_X_BIRIM = "SELECT * FROM "+TABLE_KISI_X_BIRIM+" WHERE "+COLUMN_KISI_X_BIRIM_BIRIM_ID+" = ?";
     public static final String QUERY_KISI_X_BIRIM = "SELECT * FROM "+TABLE_KISI_X_BIRIM+" WHERE "+COLUMN_KISI_X_BIRIM_BIRIM_ID+" = ?  AND "+COLUMN_KISI_X_BIRIM_KISI_ID+" = ? AND "+COLUMN_KISI_X_BIRIM_GOREV_BASLAMA_TARIHI+" = ?";
     public static final String INSERT_KISI_X_BIRIM="INSERT INTO "+TABLE_KISI_X_BIRIM+" ( "+COLUMN_KISI_X_BIRIM_KISI_ID+","+COLUMN_KISI_X_BIRIM_BIRIM_ID+","+
             COLUMN_KISI_X_BIRIM_GOREV_BASLAMA_TARIHI+","+COLUMN_KISI_X_BIRIM__GORER_BITIS_TARIHI+" ) VALUES (?,?,?,?)";
+
+    public static final String FIND_KISI_BIRIMLER = "SELECT * FROM "+ TABLE_BIRIMLER +" LEFT JOIN "+ TABLE_KISI_X_BIRIM+" ON + "+COLUMN_BIRIM_ID+ "="+ COLUMN_KISI_X_BIRIM_BIRIM_ID +
+            " WHERE "+COLUMN_KISILER_ID+ "= ?";
 
 
 
     private Connection conn;
 
     private PreparedStatement selectAllKisiler;
+    private PreparedStatement findKisi;
+    private PreparedStatement findBirim;
+    private PreparedStatement findKisiXBirim;
+    private PreparedStatement findKisiBirimler;
     private PreparedStatement queryKisi;
     private PreparedStatement queryBirim;
     private PreparedStatement queryKisiXBirim;
@@ -62,18 +73,22 @@ public class DataModel {
     private DataModel(){
     }
 
+    /**Veritabanı nesnesinin biricik örneğini döndüren method.*/
     public static DataModel getInstance(){
         return dataModel;
     }
 
+    /** Veritabanı bağlantısını başlat.*/
     public boolean openConn(){
         try{
-            conn        = DriverManager.getConnection(DB_FULL_PATH);
-            queryKisi   = conn.prepareStatement(QUERY_KISI);
-            queryBirim  = conn.prepareStatement(QUERY_BIRIM);
-            queryKisiXBirim = conn.prepareStatement(QUERY_KISI_X_BIRIM);
-            insertBirim = conn.prepareStatement(INSERT_BIRIM, Statement.RETURN_GENERATED_KEYS);
-            insertKisi  = conn.prepareStatement(INSERT_KISI,Statement.RETURN_GENERATED_KEYS);
+            conn             = DriverManager.getConnection(DB_FULL_PATH);
+            findKisi         = conn.prepareStatement(FIND_KISI);
+            findKisiBirimler = conn.prepareStatement(FIND_KISI_BIRIMLER);
+            queryKisi        = conn.prepareStatement(QUERY_KISI);
+            queryBirim       = conn.prepareStatement(QUERY_BIRIM);
+            queryKisiXBirim  = conn.prepareStatement(QUERY_KISI_X_BIRIM);
+            insertBirim      = conn.prepareStatement(INSERT_BIRIM, Statement.RETURN_GENERATED_KEYS);
+            insertKisi       = conn.prepareStatement(INSERT_KISI,Statement.RETURN_GENERATED_KEYS);
             insertKisiXBirim = conn.prepareStatement(INSERT_KISI_X_BIRIM, Statement.RETURN_GENERATED_KEYS);
             System.out.println("Bağlantı kuruldu -> " +getClass().getName());
             return true;
@@ -84,6 +99,7 @@ public class DataModel {
         }
     }
 
+    /**Veri tabanında bulunan hazır tüm bağlantıları kapat.*/
     public void closeConn(){
         try{
             if(insertKisiXBirim != null ) {
@@ -105,6 +121,44 @@ public class DataModel {
             e.printStackTrace();
             System.out.println("Veritabanı kapatılamadı");
         }
+    }
+
+
+    /** Kişi id'si ile tüm ait olunan birimleri bul */
+    public List<Birim> findKisiBirimler(int kisiId){
+        //**doldur*/
+        return new ArrayList<Birim>();
+    }
+    /** Kişi id' ile kişi nesnesini bul*/
+     public Kisi findKisi(int kisiId) {
+        Kisi kisi;
+        if (kisiId <=0){
+            System.out.println("Boş kişi döndürülüyor");
+            return kisi = null;
+
+        } else {
+            try {
+                kisi = new Kisi();
+                findKisi.setInt(1,kisiId);
+                ResultSet  resSet = findKisi.executeQuery();
+                resSet.next();
+                kisi.setId(resSet.getInt(COLUMN_KISILER_ID)); //id
+                kisi.setAd(resSet.getString(COLUMN_KISILER_AD)); //ad
+                kisi.setAd_2(resSet.getString(COLUMN_KISILER_AD2));//ad2
+                kisi.setSoyad(resSet.getString(COLUMN_KISILER_SOYAD));//soyad
+                kisi.setCepTelefon(resSet.getString(COLUMN_KISILER_CEP_TEL));//ceptel
+                kisi.setTelefon(resSet.getString(COLUMN_KISILER_TELEFON));//iştel
+                kisi.setEposta(resSet.getString(COLUMN_KISILER_EPOSTA));//eposta
+                kisi.setFotograf(resSet.getString(COLUMN_KISILER_FOTO));//foto
+                return kisi;
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Kişi bulunamıyor! ");
+                return kisi = null;
+            }
+        }
+
     }
 
     public void insertKisiXBirim(String ad, String soyad, String ad2, String telefon, String cepTelefon,
@@ -258,6 +312,7 @@ public class DataModel {
                 sb.append(COLUMN_KISILER_AD);
                 sb.append(" DESC");
             }
+            System.out.println("LİSTE --- "+sb.toString());
         }
 
         try(Statement statement = conn.createStatement()){
@@ -275,6 +330,7 @@ public class DataModel {
                 //kisi.setFotograf(resultSet.getString(COLUMN_KISILER_FOTO));
                 kisiler.add(kisi);
             }
+            System.out.println("LİSTE ----- "+kisiler.toString());
             return kisiler;
 
         }catch (SQLException e) {

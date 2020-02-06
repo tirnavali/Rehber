@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Region?>
+
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="WelcomeController">
+
+
+       <Label layoutX="180.0" layoutY="67.0" prefHeight="30.0" prefWidth="206.0" text="Rehber Uygulamasına Hoşgeldiniz" textAlignment="CENTER" />
+       <Button layoutX="196.0" layoutY="128.0" mnemonicParsing="false" text="Yeni boş bir veritabanı oluştur" />
+       <Button layoutX="197.0" layoutY="175.0" mnemonicParsing="false" text="Mevcut veritabanı dosyası seç" />
+       <CheckBox layoutX="386.0" layoutY="360.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="191.0" selected="true" text="Her açılışta bu sayfayı göster" />
+       <Region layoutX="118.0" layoutY="55.0" prefHeight="210.0" prefWidth="328.0" />
+
+
+</AnchorPane>
