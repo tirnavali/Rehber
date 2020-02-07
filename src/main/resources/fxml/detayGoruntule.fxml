@@ -53,12 +53,12 @@
                </children>
             </GridPane>
 
-             <TableView prefHeight="200.0" prefWidth="200.0">
+             <TableView fx:id="kisininBirimleriTable" prefHeight="200.0" prefWidth="200.0">
               <columns>
-                <TableColumn fx:id="birimId" prefWidth="57.0" text="No" />
-                <TableColumn fx:id="birimAdı" prefWidth="213.0" text="Birim Adı" />
-                  <TableColumn fx:id="birimBasTar" prefWidth="144.0" text="Başlama Tarihi" />
-                  <TableColumn fx:id="birimBitTar" minWidth="1.0" prefWidth="165.0" text="Bitiş Tarihi" />
+                <TableColumn fx:id="kisi_birim_id_col" prefWidth="57.0" text="No" />
+                <TableColumn fx:id="birim_adi_col" prefWidth="213.0" text="Birim Adı" />
+                  <TableColumn fx:id="birim_bas_t_col" prefWidth="144.0" text="Başlama Tarihi" />
+                  <TableColumn fx:id="birim_bit_t_col" minWidth="1.0" prefWidth="165.0" text="Bitiş Tarihi" />
               </columns>
             </TableView>
          </children>

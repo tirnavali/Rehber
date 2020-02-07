@@ -44,13 +44,19 @@ public class DataModel {
     public static final String COLUMN_KISI_X_BIRIM_BIRIM_ID="birim_id";
     public static final String COLUMN_KISI_X_BIRIM_GOREV_BASLAMA_TARIHI="gorev_baslangic_tarihi";
     public static final String COLUMN_KISI_X_BIRIM__GORER_BITIS_TARIHI="gorev_bitis_tarihi";
-    public static final String FIND_KISI_X_BIRIM = "SELECT * FROM "+TABLE_KISI_X_BIRIM+" WHERE "+COLUMN_KISI_X_BIRIM_BIRIM_ID+" = ?";
+    /**select kisi_birim_calisir.id, birim_adi, gorev_baslangic_tarihi, gorev_bitis_tarihi from kisi_birim_calisir left join birimler on birimler.id = kisi_birim_calisir.birim_id*/
+    public static final String FIND_KISI_X_BIRIM = "SELECT "+ TABLE_KISI_X_BIRIM+"."+COLUMN_KISI_X_BIRIM_ID+"," + COLUMN_BIRIM_AD +","+ COLUMN_KISI_X_BIRIM_GOREV_BASLAMA_TARIHI+","+
+            COLUMN_KISI_X_BIRIM__GORER_BITIS_TARIHI+" FROM "+TABLE_KISI_X_BIRIM+"LEFT JOIN "+TABLE_BIRIMLER+" ON "+TABLE_BIRIMLER+"."+COLUMN_BIRIM_ID+" = "+
+            TABLE_KISI_X_BIRIM+"."+COLUMN_KISI_X_BIRIM_BIRIM_ID+ " WHERE "+COLUMN_KISI_X_BIRIM_BIRIM_ID+" = ?";
     public static final String QUERY_KISI_X_BIRIM = "SELECT * FROM "+TABLE_KISI_X_BIRIM+" WHERE "+COLUMN_KISI_X_BIRIM_BIRIM_ID+" = ?  AND "+COLUMN_KISI_X_BIRIM_KISI_ID+" = ? AND "+COLUMN_KISI_X_BIRIM_GOREV_BASLAMA_TARIHI+" = ?";
     public static final String INSERT_KISI_X_BIRIM="INSERT INTO "+TABLE_KISI_X_BIRIM+" ( "+COLUMN_KISI_X_BIRIM_KISI_ID+","+COLUMN_KISI_X_BIRIM_BIRIM_ID+","+
             COLUMN_KISI_X_BIRIM_GOREV_BASLAMA_TARIHI+","+COLUMN_KISI_X_BIRIM__GORER_BITIS_TARIHI+" ) VALUES (?,?,?,?)";
 
-    public static final String FIND_KISI_BIRIMLER = "SELECT * FROM "+ TABLE_BIRIMLER +" LEFT JOIN "+ TABLE_KISI_X_BIRIM+" ON + "+COLUMN_BIRIM_ID+ "="+ COLUMN_KISI_X_BIRIM_BIRIM_ID +
-            " WHERE "+COLUMN_KISILER_ID+ "= ?";
+//    public static final String FIND_KISI_BIRIMLER =  "SELECT "+ TABLE_KISI_X_BIRIM+"."+COLUMN_KISI_X_BIRIM_ID+", " + COLUMN_BIRIM_AD +", "+ COLUMN_KISI_X_BIRIM_GOREV_BASLAMA_TARIHI+","+
+//            COLUMN_KISI_X_BIRIM__GORER_BITIS_TARIHI+" FROM "+TABLE_KISI_X_BIRIM+" LEFT JOIN "+TABLE_BIRIMLER+" ON "+TABLE_BIRIMLER+"."+COLUMN_BIRIM_ID+" = "+
+//            TABLE_KISI_X_BIRIM+"."+COLUMN_KISI_X_BIRIM_BIRIM_ID+ " WHERE "+TABLE_KISI_X_BIRIM+"."+COLUMN_KISI_X_BIRIM_KISI_ID+" = ?";
+    public static final String FIND_KISI_BIRIMLER = "select kisi_birim_calisir.id, birim_adi, gorev_baslangic_tarihi, gorev_bitis_tarihi from kisi_birim_calisir left join birimler "
+    +"on birimler.id = kisi_birim_calisir.birim_id where kisi_birim_calisir.kisi_id = ? ";
 
 
 
@@ -125,10 +131,36 @@ public class DataModel {
 
 
     /** Kişi id'si ile tüm ait olunan birimleri bul */
-    public List<Birim> findKisiBirimler(int kisiId){
-        //**doldur*/
-        return new ArrayList<Birim>();
+    public ArrayList<KisininBirimleri> findKisiBirimler(int kisiId){
+        System.out.println("DATAMODELİM KİSİ İD' ALDIM : "+kisiId);
+        ArrayList<KisininBirimleri> kisiyeAitBirimler = new ArrayList<>();
+        KisininBirimleri kb;
+        try{
+            kb = new KisininBirimleri();
+            findKisiBirimler.setInt(1, kisiId);
+            ResultSet rs = findKisiBirimler.executeQuery();
+            while(rs.next()){
+                System.out.println("Kayıt bilgisi var");
+                kb.setId(rs.getInt(COLUMN_KISI_X_BIRIM_ID));
+                kb.setBirim_adi(rs.getString(COLUMN_BIRIM_AD));
+                kb.setBaslama_tar(rs.getString(COLUMN_KISI_X_BIRIM_GOREV_BASLAMA_TARIHI));
+                kb.setBitis_tar(rs.getString(COLUMN_KISI_X_BIRIM__GORER_BITIS_TARIHI));
+                System.out.println("Yazılmadan önce kişiyeait bilgiler : "+kb.toString());
+                kisiyeAitBirimler.add(kb);
+            }
+        }
+
+        catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Kişinin birimleri bulunamıyor!");
+            kisiyeAitBirimler = null;
+        } catch(NullPointerException n) {
+            n.printStackTrace();
+
+        }
+        return kisiyeAitBirimler;
     }
+
     /** Kişi id' ile kişi nesnesini bul*/
      public Kisi findKisi(int kisiId) {
         Kisi kisi;

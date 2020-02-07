@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,8 +22,11 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.DataModel;
 import model.Kisi;
+import model.KisininBirimleri;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class AnasayfaController {
@@ -146,14 +150,16 @@ public class AnasayfaController {
             detayStage.initModality(Modality.APPLICATION_MODAL);
 
             DetayGosterController  dgController = loader.<DetayGosterController>getController();
-
             Kisi kisi = DataModel.getInstance().findKisi(secilen.getId());
-            dgController.setKisi(kisi);
+            ArrayList<KisininBirimleri> kisiyeAitBirimler = DataModel.getInstance().findKisiBirimler(secilen.getId());
+
+            dgController.setKisiAndKisiyeAitBirimler(kisi, kisiyeAitBirimler);
             detayStage.show();
 
         } catch (Exception e) {
-            System.out.println("Detay Görüntüle FXML Yüklenemedi");
             e.printStackTrace();
+            System.out.println("Detay Görüntüle FXML Yüklenemedi");
+
         }
     }
 
