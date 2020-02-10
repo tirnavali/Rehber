@@ -7,7 +7,7 @@ import java.util.List;
 
 public class DataModel {
     public static final String DB_NAME= "rehber.db";
-    public static final String DB_PATH ="jdbc:sqlite:C:\\Users\\62542\\IdeaProjects\\Rehber\\src\\main\\java\\model\\";
+    public static final String DB_PATH ="jdbc:sqlite:C:\\Users\\62542\\IdeaProjects\\Rehber\\src\\";
     public static final String DB_FULL_PATH = DB_PATH+DB_NAME;
     public static final String COLLATE_NOCASE = " COLLATE NOCASE";
     public static final int    ORDER_BY_ASC =1;
@@ -37,6 +37,7 @@ public class DataModel {
     public static final String FIND_BIRIM = "SELECT * FROM "+TABLE_BIRIMLER+" WHERE "+COLUMN_BIRIM_ID+" = ?";
     public static final String QUERY_BIRIM = "SELECT * FROM "+TABLE_BIRIMLER+" WHERE "+COLUMN_BIRIM_AD+" = ? "+COLLATE_NOCASE;
     public static final String INSERT_BIRIM = "INSERT INTO "+TABLE_BIRIMLER+" ( "+COLUMN_BIRIM_AD+" ) VALUES (?)";
+    public static final String DELETE_BIRIM = "DELETE FROM "+TABLE_BIRIMLER+" WHERE "+COLUMN_BIRIM_ID+" = ?";
 
     public static final String TABLE_KISI_X_BIRIM = "kisi_birim_calisir";
     public static final String COLUMN_KISI_X_BIRIM_ID= "id";
@@ -72,6 +73,7 @@ public class DataModel {
     private PreparedStatement queryKisiXBirim;
     private PreparedStatement insertKisiXBirim;
     private PreparedStatement insertBirim;
+    private PreparedStatement deleteBirim;
     private PreparedStatement insertKisi;
 
     private static DataModel dataModel = new DataModel();
@@ -96,6 +98,7 @@ public class DataModel {
             insertBirim      = conn.prepareStatement(INSERT_BIRIM, Statement.RETURN_GENERATED_KEYS);
             insertKisi       = conn.prepareStatement(INSERT_KISI,Statement.RETURN_GENERATED_KEYS);
             insertKisiXBirim = conn.prepareStatement(INSERT_KISI_X_BIRIM, Statement.RETURN_GENERATED_KEYS);
+            deleteBirim      = conn.prepareStatement(DELETE_BIRIM, Statement.RETURN_GENERATED_KEYS);
             System.out.println("Bağlantı kuruldu -> " +getClass().getName());
             return true;
         } catch (SQLException e) {
@@ -126,6 +129,18 @@ public class DataModel {
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Veritabanı kapatılamadı");
+        }
+    }
+
+    public int deleteBirim(Birim birim){
+        try{
+            deleteBirim.setInt(1, birim.getId());
+            int sonuc =  deleteBirim.executeUpdate();
+            return  sonuc;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 
@@ -272,7 +287,7 @@ public class DataModel {
     }
 
 
-    private int insertBirim(String birim_adi) throws SQLException{
+    public int insertBirim(String birim_adi) throws SQLException{
         queryBirim.setString(1,birim_adi);
         ResultSet resultSet = queryBirim.executeQuery();
         if(resultSet.next()){

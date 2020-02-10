@@ -97,20 +97,6 @@ public class AnasayfaController {
                 }
         );
 
-
-
-        //this.ListInformation();
-        //ObservableList<Kisi> mylist = FXCollections.observableList(DataModel.getInstance().getAllKisiler(DataModel.ORDER_BY_ASC));
-
-
-
-//        kisiAd.setCellValueFactory(cellData -> cellData.getValue().adProperty());
-//        kisiSoyad.setCellValueFactory(cellData -> cellData.getValue().soyadProperty());
-//        kisiTelefon.setCellValueFactory(cellData -> cellData.getValue().telefonProperty());
-//        kisiBirimAdi.setCellValueFactory(cellData -> cellData.getValue().epostaProperty());
-
-        //kisilerTablosu.setItems(anaEkrankisiler);
-
         Task<ObservableList<Kisi>> task = new GetAllPeopleTask();
 
         task.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>() {
@@ -128,11 +114,28 @@ public class AnasayfaController {
         });
         uprogressBar.progressProperty().bind(task.progressProperty());
         new Thread(task).start();
-
-
-
-
     }
+
+    public void birimEkle(){
+        //FXML aittir Parent aittir Scene aittir Stage
+        try{
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/birimEkle.fxml"));
+            Parent birimEkle = loader.load();
+            Scene birimEkleScene = new Scene(birimEkle);
+            Stage birimEkleStage = new Stage();
+            birimEkleStage.initOwner(anasayfaVbox.getScene().getWindow());
+            birimEkleStage.initModality(Modality.APPLICATION_MODAL);
+            birimEkleStage.setScene(birimEkleScene);
+            birimEkleStage.setTitle("Yeni Birim Ekle");
+            birimEkleStage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("BirimEkle FXML Bulunamıyor!");
+        }
+    }
+
+
     public void detayGoster(){
         Kisi secilen =  kisilerTablosu.getSelectionModel().getSelectedItem();
         System.out.println("Detaylar gösteriliyor.."+secilen.toString());
@@ -182,8 +185,6 @@ public class AnasayfaController {
 
     }
     public void listInformation(){
-        System.out.println("list information methodu çalıştı...");
-
 
         Task<ObservableList<Kisi>> task = new GetAllPeopleTask();
 
@@ -210,7 +211,6 @@ public class AnasayfaController {
     }
 
     public void refreshTable(){
-        System.out.println("çalışıyor refresher");
         this.listInformation();
         kisilerTablosu.refresh();
     }

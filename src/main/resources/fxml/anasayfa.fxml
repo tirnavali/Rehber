@@ -14,8 +14,8 @@
    <children>
       <ToolBar prefHeight="40.0" prefWidth="200.0">
         <items>
-          <Button fx:id="button1" mnemonicParsing="false" onAction="#refreshTable" text="Veri Getir" />
-            <Button mnemonicParsing="false" onAction="#ekle" text="Ekle" />
+            <Button mnemonicParsing="false" onAction="#ekle" text="Kişi Ekle" />
+          <Button fx:id="button1" mnemonicParsing="false" onAction="#birimEkle" text="Birim Düzenle" />
         </items>
       </ToolBar>
       <HBox minHeight="-Infinity" minWidth="600.0" prefHeight="362.0" prefWidth="600.0">

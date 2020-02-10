@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -61,6 +62,8 @@
                   <TableColumn fx:id="birim_bit_t_col" minWidth="1.0" prefWidth="165.0" text="Bitiş Tarihi" />
               </columns>
             </TableView>
+            <TextField fx:id="informationScreen" />
+            <Button fx:id="taskCalistir" mnemonicParsing="false" text="Güncelle" />
          </children>
       </VBox>
    </children>

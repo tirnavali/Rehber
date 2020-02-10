@@ -41,6 +41,6 @@ public class Birim {
 
     @Override
     public String toString() {
-        return ad.get();
+        return id.get()+" - "+ad.get();
     }
 }
