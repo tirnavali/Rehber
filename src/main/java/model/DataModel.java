@@ -3,6 +3,7 @@ package model;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.sqlite.SQLiteConfig;
 
 
 public class DataModel {
@@ -88,8 +89,11 @@ public class DataModel {
 
     /** Veritabanı bağlantısını başlat.*/
     public boolean openConn(){
+
         try{
-            conn             = DriverManager.getConnection(DB_FULL_PATH);
+            SQLiteConfig config = new SQLiteConfig();
+            config.enforceForeignKeys(true);
+            conn             = DriverManager.getConnection(DB_FULL_PATH,config.toProperties());
             findKisi         = conn.prepareStatement(FIND_KISI);
             findKisiBirimler = conn.prepareStatement(FIND_KISI_BIRIMLER);
             queryKisi        = conn.prepareStatement(QUERY_KISI);

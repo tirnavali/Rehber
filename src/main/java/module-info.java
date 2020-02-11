@@ -4,6 +4,7 @@ module RehberSercan {
     requires javafx.graphics;
     requires javafx.controls;
     requires java.sql;
+    requires sqlite.jdbc;
 
     opens controller to javafx.fxml;
 
