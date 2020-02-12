@@ -1,18 +1,18 @@
 package controller;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+
 import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 import model.Birim;
 import model.DataModel;
 
 import java.sql.SQLException;
-import java.util.EventListener;
 
 public class BirimEkleController {
 
@@ -30,23 +30,55 @@ public class BirimEkleController {
         informationLabel.setText("Controller yüklendi ve çalışmalara başladı.");
 
         birimlerListView.setItems(FXCollections.observableList(DataModel.getInstance().getAllBirimler(DataModel.ORDER_BY_ASC)));
+
         birimlerListView.setCellFactory(new Callback<ListView<Birim>, ListCell<Birim>>() {
             @Override
             public ListCell<Birim> call(ListView<Birim> param) {
-                ListCell<Birim> row = new ListCell<>();
+                ListCell<Birim> cell = new TabloHucreleri();
+                TextField editTxtField = new TextField();
 
-                row.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                cell.setOnKeyReleased(new EventHandler<KeyEvent>() {
                     @Override
-                    public void handle(MouseEvent event) {
-                        if(event.getClickCount() == 2 && (!row.isEmpty())){
-                            System.out.println("Çalıiştı");
+                    public void handle(KeyEvent event) {
+                        if(event.getCode().equals(KeyCode.ENTER)){
+                            Birim yeniBirim = new Birim();
+                            yeniBirim.setId(cell.getItem().getId());
+                            yeniBirim.setAd(editTxtField.getText());
+
+                            System.out.println("Hücreden alınan birim : " + yeniBirim.toString());
+                            cell.commitEdit(yeniBirim);
+                            cell.setText(yeniBirim.getAd());
+                            //cell.setGraphic(new ListCell<>());
+                           ListCell<Birim> listCell = new ListCell<>();
+                           listCell.setItem(yeniBirim);
+                           cell.setGraphic(listCell);
+                           birimlerListView.refresh();
+                           //cell.setGraphic(new TabloHucreleri());
+                        } else if(event.getCode().equals(KeyCode.ESCAPE)){
+                            System.out.println("ESCAPE BASILDI");
+                            cell.cancelEdit();
+                            cell.setGraphic(new TabloHucreleri());
+                            birimlerListView.refresh();
                         }
                     }
                 });
-                return row;
+
+                cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        if(event.getClickCount() == 2 && (!cell.isEmpty())) {
+//                            System.out.println(cell.getItem().toString());
+                            String birim_adi = birimlerListView.getSelectionModel().getSelectedItem().getAd();
+                            cell.startEdit();
+                            //cell.setText(birim_adi);
+                            editTxtField.setText(birim_adi);
+                            cell.setGraphic(editTxtField);
+                        }
+                    }
+                });
+                return cell;
             }
         });
-
     }
 
     @FXML
@@ -83,9 +115,7 @@ public class BirimEkleController {
         protected void updateItem(Birim birim, boolean empty) {
             super.updateItem(birim, empty);
 
-            setText(birim.getAd());
+            setText(birim == null ? "" : birim.getAd());
         }
     }
-
-
 }
