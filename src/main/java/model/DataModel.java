@@ -151,7 +151,7 @@ public class DataModel {
 
     /** Kişi id'si ile tüm ait olunan birimleri bul */
     public ArrayList<KisininBirimleri> findKisiBirimler(int kisiId){
-        System.out.println("DATAMODELİM KİSİ İD' ALDIM : "+kisiId);
+//        System.out.println("DATAMODELİM KİSİ İD' ALDIM : "+kisiId);
         ArrayList<KisininBirimleri> kisiyeAitBirimler = new ArrayList<>();
         KisininBirimleri kb;
         try{
@@ -250,10 +250,10 @@ public class DataModel {
             }
         } finally {
             try{
-                System.out.println("Resetting default commit behaviour");
+                System.out.println("Veri yazılıyor... Resetting default commit behaviour");
                 conn.setAutoCommit(true);
             } catch (SQLException e) {
-                System.out.println("Couldn't reset auto-commit behaviour ");
+                System.out.println("Veri yazılamadı... Couldn't reset auto-commit behaviour ");
             }
         }
     }

@@ -17,7 +17,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/anasayfa.fxml"));
         primaryStage.setTitle("Telefon rehberi By Tırnavalı V. 1.00");
-        primaryStage.setScene(new Scene(root, 740, 450));
+        primaryStage.setScene(new Scene(root, 600, 600));
         primaryStage.show();
     }
 

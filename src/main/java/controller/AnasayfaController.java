@@ -35,6 +35,13 @@ public class AnasayfaController {
     TableView<Kisi> kisilerTablosu;
     @FXML
     TableColumn<Kisi, String> kisiAd, kisiSoyad, kisiTelefon, kisiBirimAdi;
+    @FXML
+    TableColumn<KisininBirimleri, Number> idCol;
+    @FXML
+    TableColumn<KisininBirimleri, String>birimCol, basTcol, bitTcol;
+
+    @FXML
+    TableView<KisininBirimleri> kisininBirimleriTablosu;
 
     @FXML
     private ImageView fotograf ;
@@ -48,11 +55,19 @@ public class AnasayfaController {
     VBox anasayfaVbox;
 
     @FXML
+    TextField adTextField, soyadTextField, ad2TextField, isTelTextField, cepTelTextField, epostaTextField;
+
+
+    @FXML
     public void initialize(){
-        System.out.println("Controller initialize methodu çalıştı...");
+//        System.out.println("Controller initialize methodu çalıştı...");
         uprogressBar.setProgress(1);
         Image foto = new Image(getClass().getResourceAsStream("/images/person.png"));
         fotograf.setImage(foto);
+
+        ArrayList<KisininBirimleri> kisiyeAitBirimler = null;
+
+
 
 
         // kısa Yoldan yazılmış satıra tıklama fonksiyonu
@@ -75,6 +90,7 @@ public class AnasayfaController {
         //  call methodu altına yeni bir TableRow tanımlıyoruz. Olay tetikleyiciyi bu fonksiyon içinde
         //  gerçekleştiriyoruz ki istediğimiz olay tetiklenince CallBack bize dönüş yapsın.
         // */
+
         kisilerTablosu.setRowFactory(
                 new Callback<TableView<Kisi>, TableRow<Kisi>>() {
                     @Override
@@ -87,7 +103,23 @@ public class AnasayfaController {
                                         if(event.getClickCount() == 2 && (!row.isEmpty())){
                                             Kisi kisi = row.getItem();
                                             detayGoster();
-                                            System.out.println("Kişi "+kisi);
+//                                            System.out.println("Kişi "+kisi);
+                                        } else if(event.getClickCount() == 1 && (!row.isEmpty())){
+                                            Kisi kisi = DataModel.getInstance().findKisi(row.getItem().getId());
+                                            ArrayList<KisininBirimleri> mylist = DataModel.getInstance().findKisiBirimler(kisi.getId());
+
+                                            adTextField.setText(kisi.getAd());
+                                            soyadTextField.setText(kisi.getSoyad());
+                                            ad2TextField.setText(kisi.getAd_2());
+                                            cepTelTextField.setText(kisi.getCepTelefon());
+                                            isTelTextField.setText(kisi.getTelefon());
+                                            epostaTextField.setText(kisi.getEposta());
+                                            kisininBirimleriTablosu.setItems(FXCollections.observableList(mylist));
+                                            idCol.setCellValueFactory(cellData -> cellData.getValue().idProperty());
+                                            birimCol.setCellValueFactory(cellData -> cellData.getValue().birim_adiProperty());
+                                            basTcol.setCellValueFactory(cellData -> cellData.getValue().baslama_tarProperty());
+                                            bitTcol.setCellValueFactory(cellData -> cellData.getValue().bitis_tarProperty());
+
                                         }
                                     }
                                 }
@@ -108,7 +140,7 @@ public class AnasayfaController {
                 kisiBirimAdi.setCellValueFactory(cellData -> cellData.getValue().epostaProperty());
                 anaEkrankisiler = task.getValue();
                 kisilerTablosu.setItems(anaEkrankisiler);
-                System.out.println("ANA EKRAN KİSİLER --- "+anaEkrankisiler.toString());
+//                System.out.println("ANA EKRAN KİSİLER --- "+anaEkrankisiler.toString());
 
             }
         });
@@ -138,7 +170,7 @@ public class AnasayfaController {
 
     public void detayGoster(){
         Kisi secilen =  kisilerTablosu.getSelectionModel().getSelectedItem();
-        System.out.println("Detaylar gösteriliyor.."+secilen.toString());
+//        System.out.println("Detaylar gösteriliyor.."+secilen.toString());
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/detayGoruntule.fxml"));
 
@@ -167,7 +199,7 @@ public class AnasayfaController {
     }
 
     public void ekle(){
-        System.out.println("Ekle çalışıyor");
+//        System.out.println("Ekle çalışıyor");
         try{
             Parent kisiEkleParent =
                     FXMLLoader.load(getClass().getResource("/fxml/kisiEkle-2.fxml"));
@@ -220,7 +252,7 @@ public class AnasayfaController {
     class GetAllPeopleTask extends Task{
         @Override
         protected ObservableList call() throws Exception {
-            System.out.println("Task çalıştı");
+//            System.out.println("Task çalıştı");
 
             return FXCollections.observableArrayList(DataModel.getInstance().getAllKisiler(DataModel.ORDER_BY_ASC));
         }
