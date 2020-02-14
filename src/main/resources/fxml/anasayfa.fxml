@@ -46,17 +46,17 @@
                   <HBox prefHeight="100.0" prefWidth="200.0" spacing="3.0">
                      <children>
                         <ImageView fx:id="fotograf" fitHeight="150.0" fitWidth="168.0" opacity="0.45" pickOnBounds="true" preserveRatio="true" />
-                        <Button alignment="CENTER" mnemonicParsing="false" text="Değiştir">
+                        <Button fx:id="fotoDegistirButton" alignment="CENTER" disable="true" mnemonicParsing="false" onAction="#fotoDegistir" text="Değiştir">
                            <HBox.margin>
                               <Insets top="120.0" />
                            </HBox.margin>
                         </Button>
-                        <Button mnemonicParsing="false" style="-fx-background-color: #77a8f7;" text="Güncelle">
+                        <Button fx:id="guncelleButton" disable="true" mnemonicParsing="false" onAction="#kaydiGuncelle" style="-fx-background-color: #77a8f7;" text="Güncelle">
                            <HBox.margin>
                               <Insets top="120.0" />
                            </HBox.margin>
                         </Button>
-                        <Button mnemonicParsing="false" style="-fx-background-color: #8a0e14;" text="Sil">
+                        <Button fx:id="silButton" disable="true" mnemonicParsing="false" onAction="#kisiyiSil" style="-fx-background-color: #8a0e14;" text="Sil">
                            <HBox.margin>
                               <Insets top="120.0" />
                            </HBox.margin>

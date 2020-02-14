@@ -1,5 +1,8 @@
 package controller;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -7,17 +10,22 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
+import javafx.util.Duration;
 import model.Birim;
 import model.DataModel;
 import model.Kisi;
 
 import java.io.*;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -33,7 +41,7 @@ public class KisiEkleController {
     @FXML
     private DatePicker dateBaslama, dateBitis;
     @FXML
-    private Label fotografYoluLabel;
+    private Label fotografYoluLabel, kisiEkleBilgiLabel;
 
     /* Fonksiyonlarda kullanılan parametlereler */
     private Birim secilenBirim = null;
@@ -53,30 +61,56 @@ public class KisiEkleController {
         apply.setText("Kaydet");
         apply.setDisable(false);
 
-        /*Kaydet tuşuna basıldığında form alanlarındaki veriyi örnekleyerek veri tabanına kaydeder.*/
+
+
+        cancel.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+                stage.close();
+            }
+        });
+
+        /**Kaydet tuşuna basıldığında form alanlarındaki veriyi örnekleyerek veri tabanına kaydeder.*/
         apply.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                Kisi yeniKisi = new Kisi();
-                yeniKisi.setAd(inputAd.getText());
-                yeniKisi.setSoyad(inputSoyad.getText());
-                yeniKisi.setAd_2(inputAd2.getText());
-                yeniKisi.setTelefon(inputIsTelefon.getText());
-                yeniKisi.setCepTelefon(inputCepTelefon.getText());
-                yeniKisi.setEposta(inputEposta.getText());
-                yeniKisi.setFotograf("");
+                if(inputAd.getText().isBlank() || inputSoyad.getText().isBlank() ||
+                    inputIsTelefon.getText().isBlank()) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Yetersiz veri hatası");
+                    alert.setHeaderText("Yeterli veri girmediniz!");
+                    alert.setContentText("Lütfen asgari olarak (Ad, Soyad, İş Telefonu, Birim Bilgisi) alanlarına veri giriniz.");
+                    Optional<ButtonType> result = alert.showAndWait();
 
-                baslangic = dateBaslama.getValue();
-                if(dateBitis != null) {
-                    bitis = dateBitis.getValue();
                 } else {
-                    bitis = null;
-                    System.out.println(bitis.toString());
-                }
+                    Kisi yeniKisi = new Kisi();
+                    yeniKisi.setAd(inputAd.getText());
+                    yeniKisi.setSoyad(inputSoyad.getText());
+                    yeniKisi.setAd_2(inputAd2.getText());
+                    yeniKisi.setTelefon(inputIsTelefon.getText());
+                    yeniKisi.setCepTelefon(inputCepTelefon.getText());
+                    yeniKisi.setEposta(inputEposta.getText());
+                    yeniKisi.setFotograf("");
 
-                DataModel.getInstance().insertKisiXBirim(yeniKisi.getAd(),yeniKisi.getSoyad(),yeniKisi.getAd_2(),yeniKisi.getTelefon(),yeniKisi.getCepTelefon(),
-                        yeniKisi.getEposta(),yeniKisi.getFotograf(),secilenBirim.getAd(),dateBaslama.getValue().toString(),dateBitis.getValue().toString());
+                    baslangic = dateBaslama.getValue();
+                    if(dateBitis != null) {
+                        bitis = dateBitis.getValue();
+                    } else {
+                        bitis = null;
+                        System.out.println(bitis.toString());
+                    }
 
+                    DataModel.getInstance().insertKisiXBirim(yeniKisi.getAd(),yeniKisi.getSoyad(),yeniKisi.getAd_2(),yeniKisi.getTelefon(),yeniKisi.getCepTelefon(),
+                            yeniKisi.getEposta(),yeniKisi.getFotograf(),secilenBirim.getAd(),dateBaslama.getValue().toString(),dateBitis.getValue().toString());
+
+                    bilgiEkraniGuncelle("Kayıt Başarılı...");
+
+
+
+
+
+                } //end else
 
 
                 /*buradan devam*/
@@ -131,5 +165,13 @@ public class KisiEkleController {
             e.printStackTrace();
         }
 
+    }
+    /**Verilen bilgiyi bilgilendirme label ekranında 2.5 saniye göserip kaybolur.*/
+    public void bilgiEkraniGuncelle(String bilgi) {
+        kisiEkleBilgiLabel.setText(bilgi);
+        Timeline timeline = new Timeline(new KeyFrame(
+                Duration.millis(2500), actionEvent1 -> kisiEkleBilgiLabel.setText("")
+        ));
+        timeline.play();
     }
 }

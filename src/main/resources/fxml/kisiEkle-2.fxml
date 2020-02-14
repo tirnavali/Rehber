@@ -69,6 +69,7 @@
                       <RowConstraints fillHeight="false" maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                       <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                       <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
                         <ComboBox fx:id="birimComboBox" onAction="#comboBoxAction" prefHeight="25.0" prefWidth="160.0" promptText="Birim Seçiniz" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
@@ -77,6 +78,7 @@
                         <Label text="Birim Adı :" />
                         <Label text="Birime Başladığı Tarih :" GridPane.rowIndex="1" />
                         <Label text="Birimden Ayrıldığı Tarih  :" GridPane.rowIndex="2" />
+                        <Label fx:id="kisiEkleBilgiLabel" prefHeight="25.0" prefWidth="150.0" textFill="#169741" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
                      </children>
                   </GridPane>
                </children>

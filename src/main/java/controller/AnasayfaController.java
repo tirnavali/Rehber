@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -27,8 +28,9 @@ import model.KisininBirimleri;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-
+/**Anasayfa kontrolcüsü.*/
 public class AnasayfaController {
     private ObservableList<Kisi> anaEkrankisiler = null;
     @FXML
@@ -47,7 +49,7 @@ public class AnasayfaController {
     private ImageView fotograf ;
 
     @FXML
-    private Button button1, ekle;
+    private Button button1, ekle, silButton, guncelleButton, fotoDegistirButton;
 
     @FXML
     ProgressBar uprogressBar;
@@ -57,6 +59,8 @@ public class AnasayfaController {
     @FXML
     TextField adTextField, soyadTextField, ad2TextField, isTelTextField, cepTelTextField, epostaTextField;
 
+    private Task<ObservableList<Kisi>> task = new GetAllPeopleTask();
+
 
     @FXML
     public void initialize(){
@@ -65,10 +69,19 @@ public class AnasayfaController {
         Image foto = new Image(getClass().getResourceAsStream("/images/person.png"));
         fotograf.setImage(foto);
 
+        //Soldaki listede seçili olmayan birisi varsa sil, güncelle ve fotodeğiştir tuşlarını kapat.
+
+        kisilerTablosu.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null){
+                silButton.setDisable(true);
+                guncelleButton.setDisable(true);
+                fotoDegistirButton.setDisable(true);
+            }
+        });
+
+
+
         ArrayList<KisininBirimleri> kisiyeAitBirimler = null;
-
-
-
 
         // kısa Yoldan yazılmış satıra tıklama fonksiyonu
 //        kisilerTablosu.setRowFactory(tv ->
@@ -105,6 +118,12 @@ public class AnasayfaController {
                                             detayGoster();
 //                                            System.out.println("Kişi "+kisi);
                                         } else if(event.getClickCount() == 1 && (!row.isEmpty())){
+
+                                            /** Listeden bir eleman seçilirse tuşları canlandır.*/
+                                            silButton.setDisable(false);
+                                            fotoDegistirButton.setDisable(false);
+                                            guncelleButton.setDisable(false);
+
                                             Kisi kisi = DataModel.getInstance().findKisi(row.getItem().getId());
                                             ArrayList<KisininBirimleri> mylist = DataModel.getInstance().findKisiBirimler(kisi.getId());
 
@@ -129,7 +148,6 @@ public class AnasayfaController {
                 }
         );
 
-        Task<ObservableList<Kisi>> task = new GetAllPeopleTask();
 
         task.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, new EventHandler<WorkerStateEvent>() {
             @Override
@@ -140,6 +158,7 @@ public class AnasayfaController {
                 kisiBirimAdi.setCellValueFactory(cellData -> cellData.getValue().epostaProperty());
                 anaEkrankisiler = task.getValue();
                 kisilerTablosu.setItems(anaEkrankisiler);
+                kisilerTablosu.refresh();
 //                System.out.println("ANA EKRAN KİSİLER --- "+anaEkrankisiler.toString());
 
             }
@@ -147,7 +166,59 @@ public class AnasayfaController {
         uprogressBar.progressProperty().bind(task.progressProperty());
         new Thread(task).start();
     }
+    /**Anasayfadaki sol tablodan seçilen kişiyi siler.*/
+    @FXML
+    public void kisiyiSil(){
+        System.out.println("Kişi sil");
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Kişi Silme İşlemi");
+        alert.setHeaderText("Silme işlemi!");
+        alert.setContentText("Bu kişiyi veritabanından silmek istiyor musunuz?");
 
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK){
+            Kisi kisi = kisilerTablosu.getSelectionModel().getSelectedItem();
+            int silinenKayitSay =  DataModel.getInstance().deleteKisi(kisi);
+            System.out.println(silinenKayitSay+ " - kayıt silindi!");
+            kisilerTablosu.setItems(FXCollections.observableList(DataModel.getInstance().getAllKisiler(DataModel.ORDER_BY_ASC)));
+            kisilerTablosu.getSelectionModel().clearSelection();
+            clearDetailedFields();
+        } else {
+            System.out.println("silinmedi");
+            // ... user chose CANCEL or closed the dialog
+        }
+    }
+    /**Anasayfadaki sol tablodan seçilen kişiyi günceller.*/
+    @FXML
+    public void kaydiGuncelle(){
+        Kisi kisi = new Kisi();
+        kisi.setId(kisilerTablosu.getSelectionModel().getSelectedItem().getId());
+        kisi.setAd(adTextField.getText());
+        kisi.setAd_2(ad2TextField.getText());
+        kisi.setSoyad(soyadTextField.getText());
+        kisi.setCepTelefon(cepTelTextField.getText());
+        kisi.setTelefon(isTelTextField.getText());
+        kisi.setEposta(epostaTextField.getText());
+
+        //DataModel.getInstance().updateKisi(kisi);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Kişi Güncellendi");
+        alert.setHeaderText("Kişinin bilgilerini başarıyla güncellediniz!");
+        alert.setContentText("Tebrikler!");
+
+        Optional<ButtonType> result = alert.showAndWait();
+
+
+    }
+    /**Anasayfadaki sol tablodan seçilen kişinin resmini değiştirir.*/
+    @FXML
+    public void fotoDegistir(){
+        kisilerTablosu.getSelectionModel().clearSelection();
+        System.out.println("Değişen foto : ****");
+    }
+    /**Toolbardaki ekle butonuna bağlıdır. VT'ye yeni birim ekleme sayfasını açar.*/
+    @FXML
     public void birimEkle(){
         //FXML aittir Parent aittir Scene aittir Stage
         try{
@@ -167,7 +238,7 @@ public class AnasayfaController {
         }
     }
 
-
+    /**Anasayfa soldaki tabloda seçilen kişiye ait detayları göserir. */
     public void detayGoster(){
         Kisi secilen =  kisilerTablosu.getSelectionModel().getSelectedItem();
 //        System.out.println("Detaylar gösteriliyor.."+secilen.toString());
@@ -197,7 +268,8 @@ public class AnasayfaController {
 
         }
     }
-
+    /**Toolbardaki Kişi ekle butonuna bağlıdır. VT'ye yeni kişi ekleme sayfasını açar.*/
+    @FXML
     public void ekle(){
 //        System.out.println("Ekle çalışıyor");
         try{
@@ -216,6 +288,7 @@ public class AnasayfaController {
         }
 
     }
+    /**Anasayfa soldaki menüyü task olarak yükler.*/
     public void listInformation(){
 
         Task<ObservableList<Kisi>> task = new GetAllPeopleTask();
@@ -241,20 +314,40 @@ public class AnasayfaController {
         uprogressBar.progressProperty().bind(task.progressProperty());
         new Thread(task).start();
     }
+    /**kişinin ayrıntılı bilgilerini gösteren alanları temizler*/
+    private void clearDetailedFields(){
+        adTextField.clear();
+        ad2TextField.clear();
+        soyadTextField.clear();
+        isTelTextField.clear();
+        cepTelTextField.clear();
+        epostaTextField.clear();
+    }
 
+    /**Anasayfa soldaki listeyi yeniler*/
     public void refreshTable(){
         this.listInformation();
         kisilerTablosu.refresh();
     }
 
 
-
+    /**Anasayfa soldaki listeyi doldurmak için gerekli verileri sorgular.*/
     class GetAllPeopleTask extends Task{
         @Override
         protected ObservableList call() throws Exception {
 //            System.out.println("Task çalıştı");
 
             return FXCollections.observableArrayList(DataModel.getInstance().getAllKisiler(DataModel.ORDER_BY_ASC));
+        }
+
+        @Override
+        protected void succeeded() {
+            super.succeeded();
+            System.out.println("Task başarılı");
+
+
+//            kisilerTablosu.setItems(FXCollections.observableArrayList(DataModel.getInstance().getAllKisiler(DataModel.ORDER_BY_ASC)));
+//            kisilerTablosu.refresh();
         }
     }
 

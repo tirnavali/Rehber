@@ -3,6 +3,8 @@ package model;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
+/** Kişi sınıfı.
+ ** Veri tabanına yazılmak üzere hazırlanmış olan entitiy (varlık). ***/
 public class Kisi {
     private SimpleIntegerProperty id;
     private SimpleStringProperty ad;

@@ -5,10 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import org.sqlite.SQLiteConfig;
 
-
+/** Veritabanı singleton nesnesi .
+ ** Veri tabanına bağlantı kurar. Tüm tablolarla ilgili CRUD işlemlerinden sorumludur.***/
 public class DataModel {
+    /**Veritabanı dosyasının adı.*/
     public static final String DB_NAME= "rehber.db";
+    /**Veritabanı dosyasının sistemdeki yolu ve JDBC takısı. Örn:jdbc:sqlite:C:\Users\62542\IdeaProjects\Rehber\src\*/
     public static final String DB_PATH ="jdbc:sqlite:C:\\Users\\62542\\IdeaProjects\\Rehber\\src\\";
+    /**Veritabanı adı ve sistemdeki yolundan oluşan bağlantı metni.*/
     public static final String DB_FULL_PATH = DB_PATH+DB_NAME;
     public static final String COLLATE_NOCASE = " COLLATE NOCASE";
     public static final int    ORDER_BY_ASC =1;
@@ -25,6 +29,9 @@ public class DataModel {
     public static final String COLUMN_KISILER_EPOSTA = "eposta";
     public static final String COLUMN_KISILER_FOTO = "fotograf";
     public static final String FIND_KISI = "SELECT * FROM "+TABLE_KISILER+" WHERE "+COLUMN_KISILER_ID+" = ?";
+    /** UPDATE kisiler SET column_1 = new_value_1 , column_2 = new_value_2 WHERE search_condition */
+    public static final String UPDATE_KISI = "UPDATE ";
+    public static final String DELETE_KISI="DELETE FROM "+TABLE_KISILER+ " WHERE "+COLUMN_KISILER_ID+" = ?";
 
     public static final String SELECT_KISILER="SELECT * FROM "+TABLE_KISILER;
     public static final String QUERY_KISI="SELECT * FROM "+TABLE_KISILER+" WHERE "+COLUMN_KISILER_AD+" = ? AND "+COLUMN_KISILER_SOYAD+" = ?"+COLLATE_NOCASE;
@@ -75,14 +82,16 @@ public class DataModel {
     private PreparedStatement insertKisiXBirim;
     private PreparedStatement insertBirim;
     private PreparedStatement deleteBirim;
+    private PreparedStatement deleteKisi;
     private PreparedStatement insertKisi;
 
     private static DataModel dataModel = new DataModel();
 
+    /**Singleton nesne oluşturmak için yapılandırıcı private yapılmıştır.*/
     private DataModel(){
     }
 
-    /**Veritabanı nesnesinin biricik örneğini döndüren method.*/
+    /**Veritabanı nesnesinin biricik (Singleton) örneğini döndüren method.*/
     public static DataModel getInstance(){
         return dataModel;
     }
@@ -103,6 +112,7 @@ public class DataModel {
             insertKisi       = conn.prepareStatement(INSERT_KISI,Statement.RETURN_GENERATED_KEYS);
             insertKisiXBirim = conn.prepareStatement(INSERT_KISI_X_BIRIM, Statement.RETURN_GENERATED_KEYS);
             deleteBirim      = conn.prepareStatement(DELETE_BIRIM, Statement.RETURN_GENERATED_KEYS);
+            deleteKisi       = conn.prepareStatement(DELETE_KISI, Statement.RETURN_GENERATED_KEYS);
             System.out.println("Bağlantı kuruldu -> " +getClass().getName());
             return true;
         } catch (SQLException e) {
@@ -135,21 +145,33 @@ public class DataModel {
             System.out.println("Veritabanı kapatılamadı");
         }
     }
-
+    /**Birimler tablosundan Birim nesnesi alarak birim siler. Geriye veritabanından silinen satır sayısını döner.*/
     public int deleteBirim(Birim birim){
         try{
             deleteBirim.setInt(1, birim.getId());
-            int sonuc =  deleteBirim.executeUpdate();
-            return  sonuc;
+            int silinenSatirSay =  deleteBirim.executeUpdate();
+            return  silinenSatirSay;
 
         } catch (SQLException e) {
             e.printStackTrace();
             return 0;
         }
     }
+    /**Kişiler tablosundan Kişi nesnesi alarak kişi siler. Geriye veritabanından silinen satır sayısını döner.*/
+    public int deleteKisi(Kisi kisi) {
+        try{
+            deleteKisi.setInt(1, kisi.getId());
+            int silinenSatirSay = deleteKisi.executeUpdate();
+            return silinenSatirSay;
+        }catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Kişi silinemedi!");
+            return 0;
+        }
+    }
 
 
-    /** Kişi id'si ile tüm ait olunan birimleri bul */
+    /** Kişi id'si ile o kişi nesnesine ait tüm birimleri bulur ve liste olarak döner.*/
     public ArrayList<KisininBirimleri> findKisiBirimler(int kisiId){
 //        System.out.println("DATAMODELİM KİSİ İD' ALDIM : "+kisiId);
         ArrayList<KisininBirimleri> kisiyeAitBirimler = new ArrayList<>();
@@ -180,7 +202,7 @@ public class DataModel {
         return kisiyeAitBirimler;
     }
 
-    /** Kişi id' ile kişi nesnesini bul*/
+    /** Kişi id' ile veritabanından Kişi nesnesini bulur ve döner.*/
      public Kisi findKisi(int kisiId) {
         Kisi kisi;
         if (kisiId <=0){
@@ -211,7 +233,7 @@ public class DataModel {
         }
 
     }
-
+    /**Kişi ve çalıştığı birimler tablosuna verilen parametreler ile veri girişi yapar.*/
     public void insertKisiXBirim(String ad, String soyad, String ad2, String telefon, String cepTelefon,
                                  String eposta, String fotograf, String birimAdi, String gorevBas, String gorevBit){
         try{
@@ -318,7 +340,7 @@ public class DataModel {
 //
 //
 //    }
-
+    /**Sıralama bilgisini girdi olarak alır. Tüm birimlerin listesini döner.*/
     public List<Birim> getAllBirimler(int orderStyle){
         StringBuilder sb = new StringBuilder("SELECT * FROM ");
         sb.append(TABLE_BIRIMLER);
@@ -349,7 +371,7 @@ public class DataModel {
             return null;
         }
     }
-
+    /**Sıralama bilgisini girdi olarak alır. Tüm kişilerin listesini döner.*/
     public List<Kisi> getAllKisiler(int orderType){
         StringBuilder sb = new StringBuilder("SELECT * FROM ");
         sb.append(TABLE_KISILER);
