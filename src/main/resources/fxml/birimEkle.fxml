@@ -5,15 +5,17 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.BirimEkleController">
+<AnchorPane prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.BirimController">
    <children>
-      <VBox prefHeight="350.0" prefWidth="400.0" style="-fx-background-color: begie;">
+      <VBox prefHeight="400.0" prefWidth="400.0" spacing="5.0" style="-fx-background-color: begie;">
          <children>
             <GridPane hgap="3.0" vgap="5.0">
               <columnConstraints>
@@ -24,23 +26,33 @@
               <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
                   <Label text="Yeni Birim Adı" GridPane.vgrow="ALWAYS" />
                   <TextField fx:id="birimAdiTextField" GridPane.columnIndex="1" GridPane.vgrow="ALWAYS" />
-                  <Button fx:id="ekleButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#birimEkle" prefWidth="100.0" text="Ekle" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
-                  <Label fx:id="informationLabel" alignment="CENTER" text="Bilgi Ekranı" textFill="#b92020" GridPane.columnSpan="2" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS" />
-                  <Button fx:id="duzenleButton" mnemonicParsing="false" onAction="#duzenle" prefWidth="100.0" text="Düzenle" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
-                  <TextField fx:id="duzenlenecekTextField" disable="true" promptText="Düzenlemek için listeden veri seçin" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Label text="Label" GridPane.rowIndex="1" />
+                  <Button fx:id="ekleButton" alignment="CENTER" contentDisplay="CENTER" maxWidth="75.0" minWidth="75.0" mnemonicParsing="false" onAction="#birimEkle" prefWidth="75.0" text="Ekle" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
+                  <Label fx:id="informationLabel" alignment="CENTER" text="Bilgi Ekranı" textFill="#b92020" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
                </children>
                <VBox.margin>
                   <Insets />
                </VBox.margin>
+               <padding>
+                  <Insets bottom="5.0" />
+               </padding>
             </GridPane>
-            <ListView fx:id="birimlerListView" prefHeight="200.0" prefWidth="200.0" />
-            <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#birimSil" text="Kaydı Sil" />
+            <ListView fx:id="birimlerListView" prefHeight="300.0" prefWidth="200.0">
+               <tooltip>
+                  <Tooltip text="Düzenlemek için iki kez tıklayın. Düzenleme bitince ENTER'a basın. Vazgeçmek için ESC'ye basın." />
+               </tooltip></ListView>
+            <HBox prefHeight="40.0" prefWidth="200.0" spacing="10.0">
+               <children>
+                  <Button fx:id="deleteButton" alignment="CENTER" contentDisplay="RIGHT" minWidth="75.0" mnemonicParsing="false" onAction="#birimSil" text="Sil" />
+                  <Button fx:id="duzenleButton" alignment="CENTER" contentDisplay="RIGHT" minWidth="75.0" mnemonicParsing="false" onAction="#duzenle" text="Düzenle" />
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </HBox>
          </children>
          <padding>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
