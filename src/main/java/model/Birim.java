@@ -41,6 +41,12 @@ public class Birim {
 
     @Override
     public String toString() {
-        return id.get()+" - "+ad.get();
+        String output = ""+id.get();
+        if (output.length() == 1) {
+            output = "00".concat(output);
+        } else if (output.length() == 2) {
+            output = "0".concat(output);
+        }
+        return output+" - "+ad.get();
     }
 }

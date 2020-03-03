@@ -22,12 +22,37 @@ public class BirimEkleController {
     private Label informationLabel;
     @FXML
     private ListView<Birim> birimlerListView;
+    @FXML
+    private Button ekleButton, deleteButton;
 
 
 
     @FXML
     public void initialize() {
-        informationLabel.setText("Controller yüklendi ve çalışmalara başladı.");
+        /** Sayfa açılırken konfigürasyon ayarları ...*/
+        ekleButton.setDisable(true);
+        /** Sayfa açılırken konfigürasyon ayarları ...*/
+        informationLabel.setText("BİRİM Controller yüklendi ve çalışmalara başladı.");
+
+        birimlerListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+
+                deleteButton.setDisable(false);
+
+            } else {
+
+                deleteButton.setDisable(true);
+            }
+        });
+
+        birimAdiTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.isBlank() || newValue.isEmpty()) {
+                ekleButton.setDisable(true);
+            } else {
+                ekleButton.setDisable(false);
+            }
+        });
+
 
         birimlerListView.setItems(FXCollections.observableList(DataModel.getInstance().getAllBirimler(DataModel.ORDER_BY_ASC)));
 
@@ -44,16 +69,27 @@ public class BirimEkleController {
                             Birim yeniBirim = new Birim();
                             yeniBirim.setId(cell.getItem().getId());
                             yeniBirim.setAd(editTxtField.getText());
+                            /**Yeni birim güncellemesi veri tabanına yazılıyor.*/
+                            try {
+                                DataModel.getInstance().updateBirim(yeniBirim.getId(), yeniBirim.getAd());
+                                informationLabel.setText("Veri düzenlendi!");
+                                birimlerListView.setItems(FXCollections.observableList(DataModel.getInstance().getAllBirimler(DataModel.ORDER_BY_ASC)));
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                                informationLabel.setText("Veri düzenlenirken VT. Problemi oluştu.!");
+                            }
 
-                            System.out.println("Hücreden alınan birim : " + yeniBirim.toString());
+                            /**Yeni birim güncellemesi veri tabanına yazılıyor.*/
+
+//                            System.out.println("Hücreden alınan birim : " + yeniBirim.toString());
                             cell.commitEdit(yeniBirim);
-                            cell.setText(yeniBirim.getAd());
-                            //cell.setGraphic(new ListCell<>());
-                           ListCell<Birim> listCell = new ListCell<>();
-                           listCell.setItem(yeniBirim);
-                           cell.setGraphic(listCell);
-                           birimlerListView.refresh();
-                           //cell.setGraphic(new TabloHucreleri());
+//                            cell.setText(yeniBirim.getAd());
+                            cell.setGraphic(new ListCell<>());
+//                           ListCell<Birim> listCell = new ListCell<>();
+//                           listCell.setItem(yeniBirim);
+                           //cell.setGraphic(listCell);
+                           //birimlerListView.refresh();
+//                           cell.setGraphic(new TabloHucreleri());
                         } else if(event.getCode().equals(KeyCode.ESCAPE)){
                             System.out.println("ESCAPE BASILDI");
                             cell.cancelEdit();
@@ -80,12 +116,12 @@ public class BirimEkleController {
             }
         });
     }
-
+    /**Seçili birimi düzenleyen fonk.*/
     @FXML
     public void duzenle(){
-        informationLabel.setText("Düzenleme  çalışıyor.");
+        informationLabel.setText(birimlerListView.getSelectionModel().getSelectedItem().toString());
     }
-
+    /**Seçili birimi silen fonk.*/
     @FXML
     public void birimSil(){
         Birim birim = birimlerListView.getSelectionModel().getSelectedItem();
@@ -93,28 +129,30 @@ public class BirimEkleController {
         informationLabel.setText("Silinen kayıt sayısı : "+sonuc);
         birimlerListView.setItems(FXCollections.observableList(DataModel.getInstance().getAllBirimler(DataModel.ORDER_BY_ASC)));
     }
-
+    /**Yeni birim ekleme fonks.*/
     @FXML
     public void birimEkle(){
-
         Birim yeniBirim = new Birim();
         yeniBirim.setAd(birimAdiTextField.getText());
         informationLabel.setText("Birim ekleniyor..."+yeniBirim.toString());
+            /**Ekleme başarılı olursa...*/
         try{
             int sonuc = DataModel.getInstance().insertBirim(yeniBirim.getAd());
             informationLabel.setText("Yeni verinin id'si: "+sonuc);
             birimlerListView.setItems(FXCollections.observableList(DataModel.getInstance().getAllBirimler(DataModel.ORDER_BY_ASC)));
+            birimAdiTextField.clear();
+            /**Ekleme başarısız olursa...*/
         } catch (SQLException e) {
             e.printStackTrace();
             informationLabel.setText("Veritabanına yazılamadı!");
         }
 
     }
+    /**Birim düzenleme sınıfı. Liteye Çift tıklayınca aktif olur.*/
     class TabloHucreleri extends ListCell<Birim> {
         @Override
         protected void updateItem(Birim birim, boolean empty) {
             super.updateItem(birim, empty);
-
             setText(birim == null ? "" : birim.getAd());
         }
     }

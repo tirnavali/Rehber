@@ -45,6 +45,8 @@ public class DataModel {
     public static final String FIND_BIRIM = "SELECT * FROM "+TABLE_BIRIMLER+" WHERE "+COLUMN_BIRIM_ID+" = ?";
     public static final String QUERY_BIRIM = "SELECT * FROM "+TABLE_BIRIMLER+" WHERE "+COLUMN_BIRIM_AD+" = ? "+COLLATE_NOCASE;
     public static final String INSERT_BIRIM = "INSERT INTO "+TABLE_BIRIMLER+" ( "+COLUMN_BIRIM_AD+" ) VALUES (?)";
+    /**UPDATE BIRIMLER SET birim_adi = ? WHERE birim_id = ?*/
+    public static final String UPDATE_BIRIM = "UPDATE "+TABLE_BIRIMLER+" SET "+ COLUMN_BIRIM_AD+" = ? "+" WHERE "+COLUMN_BIRIM_ID+" = ? ";
     public static final String DELETE_BIRIM = "DELETE FROM "+TABLE_BIRIMLER+" WHERE "+COLUMN_BIRIM_ID+" = ?";
 
     public static final String TABLE_KISI_X_BIRIM = "kisi_birim_calisir";
@@ -84,6 +86,7 @@ public class DataModel {
     private PreparedStatement deleteBirim;
     private PreparedStatement deleteKisi;
     private PreparedStatement insertKisi;
+    private PreparedStatement updateBirim;
 
     private static DataModel dataModel = new DataModel();
 
@@ -107,12 +110,14 @@ public class DataModel {
             findKisiBirimler = conn.prepareStatement(FIND_KISI_BIRIMLER);
             queryKisi        = conn.prepareStatement(QUERY_KISI);
             queryBirim       = conn.prepareStatement(QUERY_BIRIM);
+            findBirim        = conn.prepareStatement(FIND_BIRIM);
             queryKisiXBirim  = conn.prepareStatement(QUERY_KISI_X_BIRIM);
             insertBirim      = conn.prepareStatement(INSERT_BIRIM, Statement.RETURN_GENERATED_KEYS);
             insertKisi       = conn.prepareStatement(INSERT_KISI,Statement.RETURN_GENERATED_KEYS);
             insertKisiXBirim = conn.prepareStatement(INSERT_KISI_X_BIRIM, Statement.RETURN_GENERATED_KEYS);
             deleteBirim      = conn.prepareStatement(DELETE_BIRIM, Statement.RETURN_GENERATED_KEYS);
             deleteKisi       = conn.prepareStatement(DELETE_KISI, Statement.RETURN_GENERATED_KEYS);
+            updateBirim      = conn.prepareStatement(UPDATE_BIRIM);
             System.out.println("Bağlantı kuruldu -> " +getClass().getName());
             return true;
         } catch (SQLException e) {
@@ -311,7 +316,26 @@ public class DataModel {
             }
         }
     }
+    /**ID ve yeni ad verilir birim adı güncellenir.*/
+    public int updateBirim(int birim_id, String yeni_birim_adi) throws SQLException {
+        findBirim.setInt(1, birim_id);
+        ResultSet resultSet = findBirim.executeQuery();
+            /**Birim bulunursa...*/
+        if (resultSet.next()){
+            Birim guncellenecekBirim = new Birim();
+            guncellenecekBirim.setId(resultSet.getInt(COLUMN_BIRIM_ID));
+            guncellenecekBirim.setAd(yeni_birim_adi);
+            updateBirim.setString(1, guncellenecekBirim.getAd() );
+            updateBirim.setInt(2, guncellenecekBirim.getId());
+            int etkilenenSatir = updateBirim.executeUpdate();
+            return etkilenenSatir;
 
+            /**Birim bulunamazsa...*/
+        } else{
+            return 0;
+        }
+
+    }
 
     public int insertBirim(String birim_adi) throws SQLException{
         queryBirim.setString(1,birim_adi);
